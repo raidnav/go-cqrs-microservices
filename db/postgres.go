@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
-	"github.com/raidnav/pusher/schema"
+	"github.com/raidnav/go-cqrs-microservices/schema"
 )
 
 type PostgresRepository struct {

@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"github.com/raidnav/pusher/schema"
+	"github.com/raidnav/go-cqrs-microservices/schema"
 )
 
 type Repository interface {
