@@ -26,7 +26,10 @@ func (e *NatsEventStore) Close() {
 		e.nc.Close()
 	}
 	if e.meowCreatedSubscription != nil {
-		e.meowCreatedSubscription.Unsubscribe()
+		err := e.meowCreatedSubscription.Unsubscribe()
+		if err != nil {
+			panic("Cannot unsubscribe event store, " + err.Error())
+		}
 	}
 	close(e.meowCreatedChan)
 }
@@ -47,4 +50,41 @@ func (mq *NatsEventStore) writeMessage(m Message) ([]byte, error) {
 		return nil, err
 	}
 	return b.Bytes(), nil
+}
+
+func (e *NatsEventStore) OnMeowCreated(f func(MeowCreatedMessage)) (err error) {
+	m := MeowCreatedMessage{}
+	e.meowCreatedSubscription, err = e.nc.Subscribe(m.Key(), func(msg *nats.Msg) {
+		e.readMessage(msg.Data, &m)
+		f(m)
+	})
+	return
+}
+
+func (mq *NatsEventStore) readMessage(data []byte, m interface{}) error {
+	b := bytes.Buffer{}
+	b.Write(data)
+	return gob.NewDecoder(&b).Decode(m)
+}
+
+func (e *NatsEventStore) SubscribeMeowCreate() (<-chan MeowCreatedMessage, error) {
+	m := MeowCreatedMessage{}
+	e.meowCreatedChan = make(chan MeowCreatedMessage, 64)
+	ch := make(chan *nats.Msg, 64)
+	var err error
+	e.meowCreatedSubscription, err = e.nc.ChanSubscribe(m.Key(), ch)
+	if err != nil {
+		return nil, err
+	}
+	// Decode message
+	go func() {
+		for {
+			select {
+			case msg := <-ch:
+				e.readMessage(msg.Data, &m)
+				e.meowCreatedChan <- m
+			}
+		}
+	}()
+	return (<-chan MeowCreatedMessage)(e.meowCreatedChan), nil
 }
