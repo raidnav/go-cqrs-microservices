@@ -6,9 +6,18 @@ import (
 	"github.com/raidnav/go-cqrs-microservices/schema"
 )
 
+/**
+Repository interface is to handle interaction between db.
+It supports querying and inserting data to postgres.
+*/
+
 type PostgresRepository struct {
 	db *sql.DB
 }
+
+/**
+Initiates connection to database.
+*/
 
 func NewPostgres(url string) (*PostgresRepository, error) {
 	db, err := sql.Open("postgres", url)

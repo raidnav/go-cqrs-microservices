@@ -5,6 +5,10 @@ import (
 	"github.com/raidnav/go-cqrs-microservices/schema"
 )
 
+/**
+API contract to provide repository actions.
+*/
+
 type Repository interface {
 	Close()
 	InsertMeows(ctx context.Context, meow schema.Meow) error
