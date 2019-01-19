@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-// Nats event store structure.
+// NatsEventStore structure.
 type NatsEventStore struct {
 	nc                      *nats.Conn
 	meowCreatedSubscription *nats.Subscription
@@ -37,6 +37,7 @@ func (natsEventStore *NatsEventStore) Close() {
 	close(natsEventStore.meowCreatedChan)
 }
 
+// PublishMeowCreated is to publish message in schema form
 func (natsEventStore *NatsEventStore) PublishMeowCreated(meow schema.Meow) error {
 	m := MeowCreatedMessage{meow.ID, meow.Body, meow.CreatedAt}
 	data, err := natsEventStore.writeMessage(&m)
@@ -56,7 +57,7 @@ func (natsEventStore *NatsEventStore) writeMessage(m Message) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-// Starts getting message
+// OnMeowCreated is creating subscription to nats
 func (natsEventStore *NatsEventStore) OnMeowCreated(f func(MeowCreatedMessage)) (err error) {
 	m := MeowCreatedMessage{}
 	natsEventStore.meowCreatedSubscription, err = natsEventStore.nc.Subscribe(m.Key(), func(msg *nats.Msg) {
@@ -75,7 +76,7 @@ func (natsEventStore *NatsEventStore) readMessage(data []byte, m interface{}) er
 	return gob.NewDecoder(&b).Decode(m)
 }
 
-// Create an intermediate channel is created to transform messages into appropriate type.
+// SubscribeMeowCreate creates an intermediate channel is created to transform messages into appropriate type.
 func (natsEventStore *NatsEventStore) SubscribeMeowCreate() (<-chan MeowCreatedMessage, error) {
 	m := MeowCreatedMessage{}
 	natsEventStore.meowCreatedChan = make(chan MeowCreatedMessage, 64)

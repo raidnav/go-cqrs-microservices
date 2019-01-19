@@ -7,11 +7,7 @@ import (
 	"log"
 )
 
-/**
-Repository interface is to handle interaction between db.
-It supports querying and inserting data to postgres.
-*/
-
+//Repository interface is to handle interaction between db. It supports querying and inserting data to postgres.
 type PostgresRepository struct {
 	db *sql.DB
 }
@@ -27,6 +23,7 @@ func NewPostgres(url string) (*PostgresRepository, error) {
 	}, nil
 }
 
+// Close connection to database
 func (r *PostgresRepository) Close() {
 	err := r.db.Close()
 	if err != nil {
@@ -34,11 +31,13 @@ func (r *PostgresRepository) Close() {
 	}
 }
 
+// InsertMeows is to append meow object to database
 func (r *PostgresRepository) InsertMeows(ctx context.Context, meow schema.Meow) error {
 	_, err := r.db.Exec("INSERT INTO meows(id, body, created_at) VALUES ($1, $2, $3)", meow.ID, meow.Body, meow.CreatedAt)
 	return err
 }
 
+// ListMeows is to fetch all meows from database
 func (r *PostgresRepository) ListMeows(ctx context.Context, skip uint64, take uint64) ([]schema.Meow, error) {
 	rows, err := r.db.Query("SELECT * FROM meows ORDER BY id DESC OFFSET $1 LIMIT $2", skip, take)
 	if err != nil {
