@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"github.com/nats-io/go-nats"
 	"github.com/raidnav/go-cqrs-microservices/schema"
+	"log"
 )
 
 // Nats event store structure.
@@ -30,7 +31,7 @@ func (natsEventStore *NatsEventStore) Close() {
 	if natsEventStore.meowCreatedSubscription != nil {
 		err := natsEventStore.meowCreatedSubscription.Unsubscribe()
 		if err != nil {
-			panic("Cannot unsubscribe event store, " + err.Error())
+			log.Printf("Cannot unsubscribe event store, " + err.Error())
 		}
 	}
 	close(natsEventStore.meowCreatedChan)
@@ -61,7 +62,7 @@ func (natsEventStore *NatsEventStore) OnMeowCreated(f func(MeowCreatedMessage)) 
 	natsEventStore.meowCreatedSubscription, err = natsEventStore.nc.Subscribe(m.Key(), func(msg *nats.Msg) {
 		err := natsEventStore.readMessage(msg.Data, &m)
 		if err != nil {
-			panic("Unable to read message")
+			log.Printf("Unable to read message")
 		}
 		f(m)
 	})
@@ -92,7 +93,7 @@ func (natsEventStore *NatsEventStore) SubscribeMeowCreate() (<-chan MeowCreatedM
 				err := natsEventStore.readMessage(msg.Data, &m)
 
 				if err != nil {
-					panic("Unable to read message")
+					log.Printf("Unable to read message")
 				}
 
 				natsEventStore.meowCreatedChan <- m

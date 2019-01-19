@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/raidnav/go-cqrs-microservices/schema"
+	"log"
 )
 
 /**
@@ -29,7 +30,7 @@ func NewPostgres(url string) (*PostgresRepository, error) {
 func (r *PostgresRepository) Close() {
 	err := r.db.Close()
 	if err != nil {
-		panic("Unable to close database connection")
+		log.Printf("Unable to close database connection")
 	}
 }
 

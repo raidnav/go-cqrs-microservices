@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ func responseOK(w http.ResponseWriter, body interface{}) {
 	err := json.NewEncoder(w).Encode(body)
 
 	if err != nil {
-		panic("Unable to parse json body")
+		log.Printf("Unable to parse json body")
 	}
 }
 
@@ -27,6 +28,6 @@ func responseERROR(w http.ResponseWriter, code int, message string) {
 	err := json.NewEncoder(w).Encode(body)
 
 	if err != nil {
-		panic("Unable to parse json body")
+		log.Printf("Unable to parse json body")
 	}
 }
