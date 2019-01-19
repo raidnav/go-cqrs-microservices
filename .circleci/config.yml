@@ -33,9 +33,18 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
 
-      - run: go build
+      - run:
+          name: Run unit tests
+          environment:
+            CONTACTS_DB_URL: "postgres://raidnav@localhost:5432/integration_services?sslmode=disable"
+            CONTACTS_DB_MIGRATIONS: /go/src/github.com/raidnav/go-cqrs-microservices/postgres/up
+          command: |
+            trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+            make test | tee ${TEST_RESULTS}/go-test.out
 
-      - save_cache: # Store cache in the /go/pkg directory
+      - run: make
+
+      - save_cache:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
