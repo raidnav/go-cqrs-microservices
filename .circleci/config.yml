@@ -33,7 +33,7 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
 
-      - run: make
+      - run: go build
 
       - save_cache: # Store cache in the /go/pkg directory
           key: v1-pkg-cache
