@@ -7,10 +7,7 @@ import (
 	"github.com/raidnav/go-cqrs-microservices/schema"
 )
 
-/**
-Nats event store structure.
-*/
-
+// Nats event store structure.
 type NatsEventStore struct {
 	nc                      *nats.Conn
 	meowCreatedSubscription *nats.Subscription
@@ -25,10 +22,7 @@ func newNats(url string) (*NatsEventStore, error) {
 	return &NatsEventStore{nc: nc}, nil
 }
 
-/**
-Close connection to nats
-*/
-
+// Close connection to nats
 func (e *NatsEventStore) Close() {
 	if e.nc != nil {
 		e.nc.Close()
@@ -51,10 +45,7 @@ func (e *NatsEventStore) PublishMeowCreated(meow schema.Meow) error {
 	return e.nc.Publish(m.Key(), data)
 }
 
-/**
-Writes message to nats
-*/
-
+// Writes message to nats
 func (mq *NatsEventStore) writeMessage(m Message) ([]byte, error) {
 	b := bytes.Buffer{}
 	err := gob.NewEncoder(&b).Encode(m)
@@ -64,10 +55,7 @@ func (mq *NatsEventStore) writeMessage(m Message) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-/**
-Starts getting message
-*/
-
+// Starts getting message
 func (e *NatsEventStore) OnMeowCreated(f func(MeowCreatedMessage)) (err error) {
 	m := MeowCreatedMessage{}
 	e.meowCreatedSubscription, err = e.nc.Subscribe(m.Key(), func(msg *nats.Msg) {
@@ -86,10 +74,7 @@ func (mq *NatsEventStore) readMessage(data []byte, m interface{}) error {
 	return gob.NewDecoder(&b).Decode(m)
 }
 
-/**
-Create an intermediate channel is created to transform messages into appropriate type.
-*/
-
+// Create an intermediate channel is created to transform messages into appropriate type.
 func (e *NatsEventStore) SubscribeMeowCreate() (<-chan MeowCreatedMessage, error) {
 	m := MeowCreatedMessage{}
 	e.meowCreatedChan = make(chan MeowCreatedMessage, 64)

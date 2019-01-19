@@ -15,10 +15,7 @@ type PostgresRepository struct {
 	db *sql.DB
 }
 
-/**
-Initiates connection to database.
-*/
-
+// Initiates connection to database.
 func NewPostgres(url string) (*PostgresRepository, error) {
 	db, err := sql.Open("postgres", url)
 	if err != nil {

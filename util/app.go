@@ -9,7 +9,11 @@ func responseOK(w http.ResponseWriter, body interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(body)
+	err := json.NewEncoder(w).Encode(body)
+
+	if err != nil {
+		panic("Unable to parse json body")
+	}
 }
 
 func responseERROR(w http.ResponseWriter, code int, message string) {
@@ -20,5 +24,9 @@ func responseERROR(w http.ResponseWriter, code int, message string) {
 		"error": message,
 	}
 
-	json.NewEncoder(w).Encode(body)
+	err := json.NewEncoder(w).Encode(body)
+
+	if err != nil {
+		panic("Unable to parse json body")
+	}
 }
